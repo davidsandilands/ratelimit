@@ -3,19 +3,27 @@
 # ==== Configuration ====
 API_TOKEN=""     # Replace with your API token
 PROJECT_KEY=""              # Replace with your LaunchDarkly project key
+USE_EU=false               # Set to true to use EU endpoint, false for US endpoint
 
 # List of flag keys to check
 FLAGS=("")  # Replace with your actual flag keys
+
+# Set base URL based on region
+if [ "$USE_EU" = true ]; then
+  BASE_URL="https://app.eu.launchdarkly.com"
+else
+  BASE_URL="https://app.launchdarkly.com"
+fi
 
 # ==== Iterate Over Flags ====
 for FLAG_KEY in "${FLAGS[@]}"; do
   echo "Checking flag: $FLAG_KEY"
 
-  # Get the flag state and rate limits
+  # Get the flag state
   RESPONSE=$(curl -s -i \
     -H "Authorization: $API_TOKEN" \
     -H "Content-Type: application/json" \
-    "https://app.launchdarkly.com/api/v2/flags/$PROJECT_KEY/$FLAG_KEY")
+    "$BASE_URL/api/v2/flags/$PROJECT_KEY/$FLAG_KEY")
 
   # Split headers and body
   RESPONSE_HEADERS=$(echo "$RESPONSE" | sed -n '/^[[:space:]]*$/q;p')

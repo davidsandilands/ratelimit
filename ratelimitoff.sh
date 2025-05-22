@@ -4,9 +4,17 @@
 API_TOKEN=""     # Replace with your API token
 PROJECT_KEY=""              # Replace with your LaunchDarkly project key
 ENVIRONMENT="test"                        # Choose environment: test, development, production, etc.
+USE_EU=false               # Set to true to use EU endpoint, false for US endpoint
 
 # List of flag keys to check
-FLAGS=("fresh-catalog")  # Replace with your actual flag keys
+FLAGS=("")  # Replace with your actual flag keys
+
+# Set base URL based on region
+if [ "$USE_EU" = true ]; then
+  BASE_URL="https://app.eu.launchdarkly.com"
+else
+  BASE_URL="https://app.launchdarkly.com"
+fi
 
 # ==== Iterate Over Flags ====
 for FLAG_KEY in "${FLAGS[@]}"; do
@@ -23,7 +31,7 @@ for FLAG_KEY in "${FLAGS[@]}"; do
       "path": "/environments/'$ENVIRONMENT'/on",
       "value": false
     }]' \
-    "https://app.launchdarkly.com/api/v2/flags/$PROJECT_KEY/$FLAG_KEY")
+    "$BASE_URL/api/v2/flags/$PROJECT_KEY/$FLAG_KEY")
 
   # Split headers and body
   RESPONSE_HEADERS=$(echo "$RESPONSE" | sed -n '/^[[:space:]]*$/q;p')
